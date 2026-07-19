@@ -1,12 +1,15 @@
+# Terminal options
+ARCH ?= ia32
+
 # Toolchain Configuration
 CC = gcc
+# CC = clang -target i686-unknown-none-elf
 LD = ld
 
-CC_FLAGS  := -Wall -Wextra -m32 -ffreestanding -nostdlib
+CC_FLAGS  := -Wall -Wextra -ffreestanding -nostdlib -fpie -fno-stack-protector
 ASFLAGS   := $(CC_FLAGS)
-LDFLAGS   := -m elf_i386
+LDFLAGS   :=
 
-ARCH ?= i386
 CC_FLAGS += -Iarch/$(ARCH)/include -Iinclude
 
 # Architecture-specific flags
@@ -19,8 +22,10 @@ TARGET              := $(BUILD_DIR)/kernel.elf
 C_SRCS   :=
 ASM_SRCS :=
 
-# include Architecture-specific sources
-include arch/$(ARCH)/Makefile
+
+# ------------ Sources -----------
+include arch/$(ARCH)/Makefile # architecture specific sources
+include lib/Makefile
 include kernel/Makefile
 
 C_OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(C_SRCS))
@@ -45,9 +50,9 @@ $(BUILD_DIR)/%.o: %.S
 	@$(CC) $(ASFLAGS) -c $< -o $@
 
 # =========== Linking ==============
-$(TARGET): $(OBJS) kernel.ld
+$(TARGET): $(OBJS) arch/$(ARCH)/kernel.ld
 	@echo "[Linking]   : $^ -> $@"
-	@$(LD) $(LDFLAGS) -T kernel.ld $(OBJS) -o $@
+	@$(LD) $(LDFLAGS) -T arch/$(ARCH)/kernel.ld $(OBJS) -o $@
 
 # ============ Housekeeping & phony targets ================
 clean:

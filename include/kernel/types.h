@@ -1,8 +1,9 @@
 #ifndef _kernel_types_h
 #define _kernel_types_h
 
-#include <arch_types.h>
+#include <arch/types.h>
 
+#ifndef __ARCH_HAS_BASIC_TYPES__
 typedef __UINT8_TYPE__   u8;
 typedef __UINT16_TYPE__  u16;
 typedef __UINT32_TYPE__  u32;
@@ -14,10 +15,10 @@ typedef __INT32_TYPE__   s32;
 typedef __INT64_TYPE__   s64;
 
 typedef __UINTPTR_TYPE__ uintptr_t;
-typedef __SIZE_TYPE__    size_t;
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
 
-typedef uintptr_t reg_t;
+#endif  // __ARCH_HAS_BASIC_TYPES__
+
 typedef reg_t virt_addr_t;
 typedef reg_t phys_addr_t;
 
@@ -28,6 +29,11 @@ typedef u8  uint8_t;
 typedef u16 uint16_t;
 typedef u32 uint32_t;
 typedef u64 uint64_t;
+
+typedef s8 int8_t;
+typedef s16 int16_t;
+typedef s32 int32_t;
+typedef s64 int64_t;
 
 /* --- domain specific types --- */
 typedef u32             pid_t;       /* process id stays 32-bit everywhere */

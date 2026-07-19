@@ -5,6 +5,8 @@
 #define VGA_GREEN_ON_BLACK 0x02
 #define VGA_RED_ON_BLACK   0x04
 
+#define VGA_BUFFER_ADDRESS 0xB8000
+
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
 
@@ -16,7 +18,7 @@ struct vga_entry {
 static size_t tty_row;
 static size_t tty_col;
 static u8     tty_color;
-static struct vga_entry __volatile__ * const tty_buff = (struct vga_entry __volatile__ *) 0xB8000;
+static struct vga_entry __volatile__ * const tty_buff = (struct vga_entry __volatile__ *) VGA_BUFFER_ADDRESS;
 
 void tty_init(void) {
     tty_row = 0;
@@ -27,7 +29,11 @@ void tty_init(void) {
     }
 }
 
-void vga_scroll(void) {
+void tty_clear(void) {
+    tty_init();
+}
+
+static void vga_scroll(void) {
     size_t n = (VGA_HEIGHT - 1) * VGA_WIDTH;
     for (size_t i = 0; i < n; i++) {
         tty_buff[i] = tty_buff[VGA_WIDTH + i];

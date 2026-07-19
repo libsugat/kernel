@@ -1,14 +1,24 @@
 #include <kernel/boot_params.h>
+#include <kernel/interrupts.h>
 #include <kernel/tty.h>
-#define PAGE_SIZE 4096
 
-void start(void) {
+#include <lib/kprint.h>
+
+__attribute__((__noreturn__)) void kernel_start(void) {
     tty_init();
 
-    char * msg = "Hello here I am kernel, Thanks Bootloader....\n";
-    tty_write_str(msg);
+    kputs("Hello here I am kernel, Thanks Bootloader... \n\n");
+    kputs("Initializing OS...\n");
+
+    initialize_interrupts();
+    kputs("OS Initialization Successful...\n\n");
+
+    // remove this as soon as possible
+    kputs("Good Night...\n");
 
     for (;;) {
+        kputs("zzz....\n");
         __asm__ __volatile__("hlt");
+        kputs("Who what that, shut up..\n");
     }
 }

@@ -31,6 +31,8 @@ SECTIONS {
 
     .bss :
     {
+        . = ALIGN(4K);
+        *(.bss.kernel_stack)
         *(.bss)
         *(.bss.*)
         *(COMMON)

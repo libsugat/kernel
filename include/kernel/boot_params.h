@@ -14,4 +14,3 @@ struct e820_entry {
 
 
 #endif // _KERNEL_BOOT_PARAMS_H
-
