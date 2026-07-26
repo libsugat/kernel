@@ -10,6 +10,7 @@ CC_FLAGS  := -Wall -Wextra -ffreestanding -nostdlib -fpie -fno-stack-protector
 ASFLAGS   := $(CC_FLAGS)
 LDFLAGS   :=
 
+CC_FLAGS += -std=c11
 CC_FLAGS += -Iarch/$(ARCH)/include -Iinclude
 
 # Architecture-specific flags

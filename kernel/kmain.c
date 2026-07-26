@@ -15,10 +15,9 @@ __attribute__((__noreturn__)) void kernel_start(void) {
 
     // remove this as soon as possible
     kputs("Good Night...\n");
-
     for (;;) {
         kputs("zzz....\n");
-        __asm__ __volatile__("hlt");
+        arch_wait_for_interrupt();
         kputs("Who what that, shut up..\n");
     }
 }

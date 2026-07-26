@@ -1,5 +1,6 @@
 #include <kernel/types.h>
 #include <kernel/tty.h>
+#include <kdef.h>
 
 #define VGA_WHITE_ON_BLACK 0x0F
 #define VGA_GREEN_ON_BLACK 0x02
@@ -13,7 +14,7 @@ static const size_t VGA_HEIGHT = 25;
 struct vga_entry {
     char c;
     u8 setting;
-} __attribute__((__packed__));
+} PACKED;
 
 static size_t tty_row;
 static size_t tty_col;

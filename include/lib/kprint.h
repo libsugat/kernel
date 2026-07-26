@@ -3,7 +3,7 @@
 
 #include <kernel/types.h>
 
-void kputchar(const char c);
+void kputc(const char c);
 void kputs(const char *s);
 void kprintf(const char *format, ...);
 // void ksnprintf(char *buf, size_t size, const char *format, ...);

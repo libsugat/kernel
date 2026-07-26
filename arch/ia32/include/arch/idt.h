@@ -2,6 +2,7 @@
 #define ARCH_IA32_IDT_H
 
 #include <kernel/types.h>
+#include <kdef.h>
 
 // Defining type attribute values
 #define IDT_ATTR_PRESENT      0x80 // 1000 0000
@@ -18,7 +19,7 @@ struct idt_entry {
     uint8_t  reserved;          // Should be always set to 0 and not used
     uint8_t  type_attributes;   
     uint16_t  offset_high;
-}__attribute__((__packed__));
+} PACKED;
 
 typedef struct {
     struct idt_entry entries[256];
@@ -32,10 +33,9 @@ union idt_entry_union {
 struct idtr {
     uint16_t size;
     uintptr_t offset;
-}__attribute__((__packed__));
+} PACKED;
 
-inline __attribute__((always_inline))
-void set_gate(
+ALWAYS_INLINE void set_gate(
     idt_t * idt, 
     uint8_t n, 
     const uint8_t gate_type_attr, 
@@ -51,7 +51,8 @@ void set_gate(
     new_gate.idt_entries.segment_selector = 0x08;
     new_gate.idt_entries.type_attributes = gate_type_attr | dpl_attr | IDT_ATTR_PRESENT;
 
-    // To do the memory write as quick as possible lets
+    // Not interested in atomics right now
+    // Lets do it as fast as possible so that interrupt doesnt fire up
     __asm__ __volatile__(
             "movl %2, %0\n\t" 
             "movl %3, %1"

@@ -1,9 +1,9 @@
 #include <lib/kprint.h>
 #include <kernel/tty.h>
 #include <kernel/types.h>
-#include <stdarg.h>
+#include <karg.h>
 
-void kputchar(const char c) {
+void kputc(const char c) {
     tty_putchar(c);
 }
 
@@ -18,25 +18,43 @@ void kprintf(const char *format, ...)
 
     for (const char * p = format; *p != '\0';p++) {
         if (*p != '%') {
-            kputchar(*p);
+            kputc(*p);
             continue;
         }
+
+        union {
+            char c, *s;
+            reg_t x;
+        } data;
+        
         switch (*(++p)) {
+            // Printing character
             case 'c':
-                char c = k_va_arg(args, char);
-                kputchar(c);
+                data.c = (int)k_va_arg(args, int);
+                kputc(data.c);
                 break;
+
+            // Printing String
             case 's':
-                char *s = k_va_arg(args, char*);
-                kputs(s);
+                data.s = k_va_arg(args, char*);
+                kputs(data.s);
                 break;
+
+            // Printing hex data, with the width of cpu register
             case 'x':
-                reg_t x = k_va_arg(args, reg_t);
-                kprint_hex(x);
+                data.x = k_va_arg(args, reg_t);
+                kprint_hex(data.x);
                 break;
+
+            // in case of string ending with %
+            case '\0':
+                kputc('%');
+                return;
+
+            // If it was not a format specifier
             default:
-                kputchar('%');
-                kputchar(*p);
+                kputc('%');
+                kputc(*p);
         };
     }
     k_va_end(args);
@@ -60,28 +78,22 @@ void kprint_hex8(const uint8_t val) {
 }
 
 void kprint_hexdump(const void *addr, size_t size) {
-    volatile uint32_t *ptr = (volatile uint32_t *) addr;
-    // uint8_t *ptr = (uint8_t *) addr;
+    uint8_t *ptr = (uint8_t *) addr;
     uintptr_t addr_val = (uintptr_t) addr;
 
-    kputchar('\n');
     for (size_t i = 0; i < size; i+= 16) {
         kprint_hex(addr_val + i);
         kputs(": ");
 
         size_t rem = size - i;
         size_t row_bytes = (rem < 16) ? rem : 16;
-        // for (size_t j = 0; j < row_bytes; j++) {
-        //     kprint_hex8(ptr[i + j]);
-        
-        for (size_t j = 0; j < row_bytes; j+=4) {
-            kprint_hex(ptr[(i + j) / 4]);
-            // kprint_hex(ptr[(i + j) / 4]);
-            kputchar(' ');
+        for (size_t j = 0; j < row_bytes; j++) {
+            kprint_hex8(ptr[i + j]);
+            kputc(' ');
         }
-        kputchar('\n');
+        kputc('\n');
     }
-    kputchar('\n');
+    kputc('\n');
 }
 
 // void klog(int level, const char *format, ...);

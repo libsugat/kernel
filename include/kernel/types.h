@@ -39,4 +39,7 @@ typedef s64 int64_t;
 typedef u32             pid_t;       /* process id stays 32-bit everywhere */
 typedef u64             offset_t;    /* file system offset stays 64-bit */
 
+_Static_assert(sizeof(virt_addr_t) == sizeof(void*), "vaddr_t size mismatch with pointer width!");
+_Static_assert(sizeof(u64) == 8, "u64 must be exactly 8 bytes!");
+
 #endif 

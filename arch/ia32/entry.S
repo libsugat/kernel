@@ -14,12 +14,6 @@ _entry:
 
     call pic_8259A_disable
     call setup_idt
-    movl $0x1b, %ecx
-    rdmsr
-
-    # Set bit 11 (APIC Global Enable)
-    orl $0x800, %eax
-    wrmsr
 
     // Time to move to kernel_start
     pushl $0        // push 3 zeros just as safety padding

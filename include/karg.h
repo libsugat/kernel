@@ -1,5 +1,5 @@
-#ifndef _STDARG_H
-#define _STDARG_H
+#ifndef _KARG_H
+#define _KARG_H
 
 #ifndef __ASSEMBLER__
 
@@ -10,4 +10,4 @@ typedef __builtin_va_list k_va_list;
 #define k_va_end(ap)         __builtin_va_end(ap)
 
 #endif // __ASSEMBLER__
-#endif // _STDARG_H
+#endif // _KARG_H

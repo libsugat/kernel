@@ -4,6 +4,7 @@
 #ifndef __ASSEMBLER__
 
 #include <kernel/types.h>
+#include <kdef.h>
 
 struct interrupt_frame {
     // Segment register
@@ -24,14 +25,18 @@ struct interrupt_frame {
     // Hardware state if user_space, (should be used carefully)
     reg_t esp_usr;
     uint32_t ss_usr;
-} __attribute__((__packed__));
+} PACKED;
 
-inline __attribute__((always_inline)) void arch_enable_interrupts(void) {
+static ALWAYS_INLINE void arch_enable_interrupts(void) {
     __asm__ __volatile__ ("sti");
 }
 
-inline __attribute__((always_inline)) void arch_disable_interrupts(void) {
+static ALWAYS_INLINE void arch_disable_interrupts(void) {
     __asm__ __volatile__ ("cli");
+}
+
+static ALWAYS_INLINE void arch_wait_for_interrupt(void) {
+    __asm__ __volatile__ ("hlt":::"memory");
 }
 
 #endif // __ASSEMBLER__
