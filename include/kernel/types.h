@@ -1,5 +1,7 @@
-#ifndef _kernel_types_h
-#define _kernel_types_h
+#ifndef _KERNEL_TYPES_H
+#define _KERNEL_TYPES_H
+
+#ifndef __ASSEMBLER__
 
 #include <arch/types.h>
 
@@ -35,6 +37,9 @@ typedef s16 int16_t;
 typedef s32 int32_t;
 typedef s64 int64_t;
 
+typedef u32 uintmax_t;
+typedef s32 intmax_t;
+
 /* --- domain specific types --- */
 typedef u32             pid_t;       /* process id stays 32-bit everywhere */
 typedef u64             offset_t;    /* file system offset stays 64-bit */
@@ -42,4 +47,5 @@ typedef u64             offset_t;    /* file system offset stays 64-bit */
 _Static_assert(sizeof(virt_addr_t) == sizeof(void*), "vaddr_t size mismatch with pointer width!");
 _Static_assert(sizeof(u64) == 8, "u64 must be exactly 8 bytes!");
 
+#endif // __ASSEMBLER__
 #endif 

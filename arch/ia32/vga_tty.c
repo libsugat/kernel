@@ -19,7 +19,7 @@ struct vga_entry {
 static size_t tty_row;
 static size_t tty_col;
 static u8     tty_color;
-static struct vga_entry __volatile__ * const tty_buff = (struct vga_entry __volatile__ *) VGA_BUFFER_ADDRESS;
+static struct vga_entry volatile * const tty_buff = (struct vga_entry volatile *) VGA_BUFFER_ADDRESS;
 
 void tty_init(void) {
     tty_row = 0;
@@ -51,19 +51,23 @@ static void vga_scroll(void) {
 }
 
 void tty_putchar(char c) {
-    if (c == '\n') {
-        tty_col = 0;
-        ++tty_row;
-    }
-    else {
-        const size_t index = tty_row * VGA_WIDTH + tty_col;
-        tty_buff[index] = (struct vga_entry){c, tty_color};
-
-        ++tty_col;
-        if (tty_col >= VGA_WIDTH) {
+    switch (c) {
+        case '\n':
             tty_col = 0;
-            tty_row++;
-        }
+            ++tty_row;
+            break;    
+        case '\t':
+            tty_col += 4;
+            break;
+        default:;
+            const size_t index = tty_row * VGA_WIDTH + tty_col;
+            tty_buff[index] = (struct vga_entry){c, tty_color};
+
+            ++tty_col;
+            if (tty_col >= VGA_WIDTH) {
+                tty_col = 0;
+                tty_row++;
+            }
     }
 
     if (tty_row == VGA_HEIGHT) {

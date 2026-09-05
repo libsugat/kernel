@@ -6,14 +6,14 @@ CC = gcc
 # CC = clang -target i686-unknown-none-elf
 LD = ld
 
-CC_FLAGS  := -Wall -Wextra -ffreestanding -nostdlib -fpie -fno-stack-protector
+CC_FLAGS  := -Wall -Wextra -ffreestanding -nostdlib -fPIE -fno-stack-protector -Wframe-larger-than=512
 ASFLAGS   := $(CC_FLAGS)
 LDFLAGS   :=
 
-CC_FLAGS += -std=c11
+CC_FLAGS += -std=c23
 CC_FLAGS += -Iarch/$(ARCH)/include -Iinclude
 
-# Architecture-specific flags
+# -------- Architecture-specific flags -------
 include arch/$(ARCH)/config.mk
 
 # Directories & Targets
@@ -33,6 +33,9 @@ C_OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(C_SRCS))
 ASM_OBJS := $(patsubst %.S, $(BUILD_DIR)/%.o, $(ASM_SRCS))
 OBJS := $(C_OBJS) $(ASM_OBJS)
 
+DEPS := $(C_OBJS:.o=.d)
+-include $(DEPS)
+
 # --- Rules ---
 all: $(BUILD_DIR) $(TARGET)
 
@@ -43,7 +46,7 @@ $(BUILD_DIR):
 $(BUILD_DIR)/%.o: %.c
 	@echo "[Compiling] : $< -> $@"
 	@mkdir -p $(dir $@)
-	@$(CC) $(CC_FLAGS) -c $< -o $@
+	@$(CC) $(CC_FLAGS) -MMD -MP -c $< -o $@
 
 $(BUILD_DIR)/%.o: %.S
 	@echo "[Assembling]: $< -> $@"
@@ -60,4 +63,4 @@ clean:
 	@echo "Cleaning build artifacts..."
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all run clean
+.PHONY: all clean

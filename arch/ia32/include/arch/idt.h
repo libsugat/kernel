@@ -35,7 +35,7 @@ struct idtr {
     uintptr_t offset;
 } PACKED;
 
-ALWAYS_INLINE void set_gate(
+static ALWAYS_INLINE void set_gate(
     idt_t * idt, 
     uint8_t n, 
     const uint8_t gate_type_attr, 

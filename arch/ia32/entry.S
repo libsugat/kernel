@@ -11,14 +11,20 @@
 _entry:
     // Setup the explicit stack for kernel
     movl $kstack_top, %esp
+    push %eax
+    push %ebx
 
     call pic_8259A_disable
     call setup_idt
 
+    pop %ebx
+    pop %eax
+
     // Time to move to kernel_start
-    pushl $0        // push 3 zeros just as safety padding
+    pushl $0        // push 2 zeros just as safety padding
     pushl $0
-    pushl $0
+    push %eax
+    push %ebx
     pushl $hang     // kernel should not return but let it be a safety net
     jmp kernel_start       // jump to the the C code
 

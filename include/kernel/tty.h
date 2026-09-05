@@ -9,4 +9,6 @@ void tty_putchar(char);
 void tty_write(const char *, size_t);
 void tty_write_str(const char *);
 
+void tty_write_panic(void);
+
 #endif // _KERNEL_TTY_H
