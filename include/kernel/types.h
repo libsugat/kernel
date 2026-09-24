@@ -4,6 +4,7 @@
 #ifndef __ASSEMBLER__
 
 #include <arch/types.h>
+#include <kdef.h>
 
 #ifndef __ARCH_HAS_BASIC_TYPES__
 typedef __UINT8_TYPE__   u8;
@@ -44,8 +45,8 @@ typedef s32 intmax_t;
 typedef u32             pid_t;       /* process id stays 32-bit everywhere */
 typedef u64             offset_t;    /* file system offset stays 64-bit */
 
-_Static_assert(sizeof(virt_addr_t) == sizeof(void*), "vaddr_t size mismatch with pointer width!");
-_Static_assert(sizeof(u64) == 8, "u64 must be exactly 8 bytes!");
+STATIC_ASSERT(sizeof(virt_addr_t) == sizeof(void *), "vaddr_t size mismatch with pointer width!");
+STATIC_ASSERT(sizeof(u64) == 8, "u64 must be exactly 8 bytes!");
 
 #endif // __ASSEMBLER__
 #endif 

@@ -16,10 +16,41 @@ struct vga_entry {
     u8 setting;
 } PACKED;
 
+#define DEBUG
+
 static size_t tty_row;
 static size_t tty_col;
 static u8     tty_color;
 static struct vga_entry volatile * const tty_buff = (struct vga_entry volatile *) VGA_BUFFER_ADDRESS;
+
+#if defined(DEBUG)
+#define COM1 0x3F8
+static inline void outb(uint16_t port, uint8_t val) {
+    __asm__ volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
+}
+
+static inline uint8_t inb(uint16_t port) {
+    uint8_t ret;
+    __asm__ volatile ("inb %1, %0" : "=a"(ret) : "Nd"(port));
+    return ret;
+}
+
+void init_serial(void) {
+    outb(COM1 + 1, 0x00);    // Disable all interrupts
+    outb(COM1 + 3, 0x80);    // Enable DLAB (set baud rate divisor)
+    outb(COM1 + 0, 0x03);    // Set divisor to 3 (38400 baud)
+    outb(COM1 + 1, 0x00);
+    outb(COM1 + 3, 0x03);    // 8 bits, no parity, one stop bit
+    outb(COM1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+    outb(COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+}
+
+void serial_putc(char c) {
+    // Wait until transmit buffer is empty (Line Status Register bit 5)
+    while ((inb(COM1 + 5) & 0x20) == 0);
+    outb(COM1, c);
+}
+#endif
 
 void tty_init(void) {
     tty_row = 0;
@@ -28,11 +59,16 @@ void tty_init(void) {
     for (size_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; ++i) {
         tty_buff[i] = (struct vga_entry){' ', VGA_WHITE_ON_BLACK};
     }
+    
+#if defined(DEBUG)
+    init_serial();
+#endif
 }
 
 void tty_clear(void) {
     tty_init();
 }
+
 
 static void vga_scroll(void) {
     size_t n = (VGA_HEIGHT - 1) * VGA_WIDTH;
@@ -74,6 +110,10 @@ void tty_putchar(char c) {
         tty_row = VGA_HEIGHT - 1;
         vga_scroll();
     }
+
+#if defined(DEBUG)
+    serial_putc(c);
+#endif
 }
 
 void tty_write(const char* data, size_t len) {

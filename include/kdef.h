@@ -14,7 +14,28 @@
 #define SECTION(sec)    __attribute__((section(sec)))
 
 // Critical memory access barrier
-#define barrier()       asm volatile("" ::: "memory")
+#define BARRIER()       asm volatile("" ::: "memory")
+
+#define OFFSET_OF(type, member)  __builtin_offsetof(type, member)
+
+#if defined(__has_builtin) && __has_builtin(__builtin_align_up)
+    #define ALIGN_UP(value, align)   __builtin_align_up(value, align)
+    #define ALIGN_DOWN(value, align) __builtin_align_down(value, align)
+    #define IS_ALIGNED(value, align) __builtin_is_aligned(value, align)
+#else
+    /* Fallback for GCC, MSVC, etc. (align must be a power of two) */
+    #define ALIGN_DOWN(val, align) \
+        ((__typeof__(val))((uintptr_t)(val) & ~((uintptr_t)(align) - 1)))
+
+    #define ALIGN_UP(val, align) \
+        ((__typeof__(val))(((uintptr_t)(val) + ((uintptr_t)(align) - 1)) & ~((uintptr_t)(align) - 1)))
+
+    #define IS_ALIGNED(val, align) \
+        (((uintptr_t)(val) & ((uintptr_t)(align) - 1)) == 0)
+#endif
+
+// Static compiler checks
+#define STATIC_ASSERT(cond, msg) _Static_assert((cond), msg)
 
 #endif // __ASSEMBLER__
 #endif // KDEF_H

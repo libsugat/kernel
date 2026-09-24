@@ -6,12 +6,12 @@ CC = gcc
 # CC = clang -target i686-unknown-none-elf
 LD = ld
 
-CC_FLAGS  := -Wall -Wextra -ffreestanding -nostdlib -fPIE -fno-stack-protector -Wframe-larger-than=512
-ASFLAGS   := $(CC_FLAGS)
-LDFLAGS   :=
+CFLAGS  := -Wall -Wextra -ffreestanding -nostdlib -fno-pie -mno-red-zone -fno-stack-protector -Wframe-larger-than=512
+ASFLAGS   := $(CFLAGS)
+LDFLAGS   := -nostdlib -static --emit-relocs
 
-CC_FLAGS += -std=c23
-CC_FLAGS += -Iarch/$(ARCH)/include -Iinclude
+CFLAGS += -std=c23
+CFLAGS += -Iarch/$(ARCH)/include -Iinclude
 
 # -------- Architecture-specific flags -------
 include arch/$(ARCH)/config.mk
@@ -46,7 +46,7 @@ $(BUILD_DIR):
 $(BUILD_DIR)/%.o: %.c
 	@echo "[Compiling] : $< -> $@"
 	@mkdir -p $(dir $@)
-	@$(CC) $(CC_FLAGS) -MMD -MP -c $< -o $@
+	@$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 $(BUILD_DIR)/%.o: %.S
 	@echo "[Assembling]: $< -> $@"

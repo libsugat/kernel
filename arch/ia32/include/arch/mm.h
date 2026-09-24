@@ -8,9 +8,10 @@
 
 #ifndef __ASSEMBLER__
 
+void arch_preprocess_memory_map(struct boot_info_struct * boot_info_ptr);
 
-void arch_init_mm(struct boot_info_struct * boot_info_ptr);
-void arch_build_memory_bitmap(struct boot_info_struct * boot_info_ptr);
+struct mem_map; // Forward declaration
+void arch_init_mem_map(struct boot_info_struct * boot_info_ptr, struct mem_map *mmap);
 
 #endif // __ASSEMBLER__
 #endif // ARCH_MM_H

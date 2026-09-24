@@ -5,6 +5,8 @@
 
 #include <acpi/rsdt.h>
 
+#include <arch/gdt.h>
+
 #ifndef __ASSEMBLER__
 
 #include <kdef.h>
@@ -17,6 +19,7 @@ struct e820_entry {
                                 // Bios may or may not set anything
 } PACKED;
 
+// Passed by bootloader
 struct boot_info_struct {
     struct e820_entry * e820_table;
     uint32_t e820_entries;
