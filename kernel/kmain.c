@@ -48,11 +48,13 @@ void kernel_start(
 void task_A(void) {
     for (;;) {
         kprintf("SUGAT \n");
+        arch_wait_for_interrupt();
     }
 }
 
 void task_B(void) {
     for (;;) {
         kprintf("BAGDE \n");
+        arch_wait_for_interrupt();
     }
 }

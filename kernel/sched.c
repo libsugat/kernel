@@ -1,4 +1,3 @@
-#include <lib/kprint.h>
 #include <kernel/types.h>
 #include <kernel/sched.h>
 

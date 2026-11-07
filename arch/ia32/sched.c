@@ -27,6 +27,7 @@ struct task_struct _create_new_task(void (*entry)(void), uint8_t *stack) {
     *(--sp) = (uintptr_t)entry;
     *(--sp) = 0;
     *(--sp) = (uintptr_t)task_trampoline;
+    *(--sp) = 0x00000202;
     *(--sp) = 0;
     *(--sp) = 0;
     *(--sp) = 0;

@@ -75,13 +75,15 @@ ignore_int:
 .globl switch_to
 switch_to:
     /* 1. Save callee-saved registers on Task A's stack */
+    pushfl // find a way to put this in schedule function 
+    cli
     pushl %ebp
     pushl %ebx
     pushl %esi
     pushl %edi
 
-    movl 20(%esp), %eax      /* eax = curr (pointer to task_struct) */
-    movl 24(%esp), %edx      /* edx = next (pointer to task_struct) */
+    movl 24(%esp), %eax      /* eax = curr (pointer to task_struct) */
+    movl 28(%esp), %edx      /* edx = next (pointer to task_struct) */
 
     movl %esp, (%eax)        /* curr->esp = esp (freeze Task A) */
     movl (%edx), %esp        /* esp = next->esp (switch to Task B) */
@@ -90,6 +92,7 @@ switch_to:
     popl %esi
     popl %ebx
     popl %ebp
+    popfl
 
     ret
 

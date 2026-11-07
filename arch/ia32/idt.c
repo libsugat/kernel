@@ -74,14 +74,14 @@ void higher_irq_handler(struct interrupt_frame * intr_frame) {
         return; // Return immediately WITHOUT sending EOI
     }
 
+    lapic_ops.eoi(intr_frame->vector_no);
     // Glue code, i dont want vga to clutter now
     // Hence do not show timer
-    lapic_ops.eoi(intr_frame->vector_no);
-    if (intr_frame->vector_no != 32) {
-        kprintf("hardware irq: %u\n", intr_frame->vector_no);
+    if (intr_frame->vector_no == 32) {
+        sched();
     }
     else {
-        sched();
+        kprintf("hardware irq: %u\n", intr_frame->vector_no);
     }
 }
 
