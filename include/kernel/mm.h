@@ -5,6 +5,7 @@
 
 #include <kdef.h>
 #include <kernel/types.h>
+#include <arch/mm.h>
 
 struct boot_info_struct;
 

@@ -5,6 +5,7 @@
 
 #ifndef __ASSEMBLER__
 
+void cpu_init_early(void);
 void arch_hardware_init(struct boot_info_struct * boot_info_ptr);
 
 #endif  // __ASSEMBLER__

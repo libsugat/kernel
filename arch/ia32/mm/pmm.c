@@ -1,5 +1,4 @@
 #include <arch/interrupt.h>
-#include <arch/types.h>
 #include <arch/mm.h>
 
 #include <kernel/bits.h>
@@ -8,8 +7,6 @@
 #include <kernel/mm.h>
 
 #include <lib/kprint.h>
-
-#include <kdef.h>
 
 // Beacuse it is ia32, we cannot do anything beyond this
 #define MEMORY_LIMIT_ADDR 0xFFFFFFFF
@@ -60,7 +57,7 @@ static void sort_e820_insertion(struct e820_entry *entries, size_t count) {
 
 #define SANITIZATION_ERROR 0xDEADBEEF
 static size_t santize_e820_inplace(struct e820_entry *entries, size_t count){
-    // Replace the whole function with a good tested algorithm
+    // TODO: Replace the whole function with a good tested algorithm
     if (count <= 0) return SANITIZATION_ERROR;
 
     // Sort
@@ -132,7 +129,9 @@ void arch_preprocess_memory_map(struct boot_info_struct *boot_info_ptr)
 
     size_t u_entries = santize_e820_inplace(e820t, entries);
     boot_info_ptr->e820_entries = u_entries;
+
     if (u_entries == SANITIZATION_ERROR) {
+        // TODO: Change this to proper kernel panic
         kputs("Panci.....");
         for (;;) {
             arch_disable_interrupts();
@@ -300,6 +299,7 @@ void arch_init_mem_map(struct boot_info_struct *boot_info_ptr, struct mem_map *m
         mmap->freelist[i] = NULL;
     }
     mmap_meta[0].ref_cnt++; // Keep page 0 permanently reserved (Suggested by gemini)
+                            // Makes sense, NULL maps to memory address 0x00
     for (int i = total_pages - 1; i >= 0; i--) {
         mmap_meta[i].ref_cnt--;
         if (mmap_meta[i].ref_cnt == 0) {

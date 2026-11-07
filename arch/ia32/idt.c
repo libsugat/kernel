@@ -6,15 +6,15 @@
 
 #include <kernel/interrupts.h>
 #include <kernel/bits.h>
+#include <kernel/sched.h>
 #include <lib/kprint.h>
 
 #include <arch/apic.h>
 
-// entry.S
-extern idt_t idt_table;
-extern struct idtr idt_desc;
+extern idt_t idt_table;      // entry.S
+extern struct idtr idt_desc; // entry.S
 
-extern struct local_irqc_ops lapic_ops;
+extern struct local_irqc_ops lapic_ops; // apic.c
 
 // isr_stub.s
 extern void (*isr_stub_list[256])(void); // Do not touch
@@ -76,15 +76,13 @@ void higher_irq_handler(struct interrupt_frame * intr_frame) {
 
     // Glue code, i dont want vga to clutter now
     // Hence do not show timer
+    lapic_ops.eoi(intr_frame->vector_no);
     if (intr_frame->vector_no != 32) {
         kprintf("hardware irq: %u\n", intr_frame->vector_no);
-
-        if (intr_frame->vector_no == 0xff) // Spurious interrupt
-        {
-            kputs("Spurious Interrupt..."); return;
-        }
     }
-    lapic_ops.eoi(intr_frame->vector_no);
+    else {
+        sched();
+    }
 }
 
 void master_fault_handler(struct interrupt_frame * intr_frame) {

@@ -3,12 +3,9 @@
 
 #ifndef __ASSEMBLER__
 
-#include <kernel/types.h>
-
 extern char __k_phy_start[];
-// extern char text_end[];
-// extern char bss_start[];
 extern char __k_phy_end[];
+extern char kstack_bottom[];
 
 #endif /* !__ASSEMBLER__ */
 

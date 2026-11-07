@@ -17,8 +17,7 @@ volatile struct lapic_mmio * get_lapic_mmio_ptr(void) {
 }
 
 static void init_lapic(void) {
-    // Check lapic capabilities
-    // TODO
+    // TODO: Check lapic capabilities
 
     // Enable lapic
     u64 msr_data = rdmsr(MSR_IA32_APIC_BASE) | 0x800;

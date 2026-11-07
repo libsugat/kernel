@@ -1,10 +1,5 @@
 .extern kernel_start
 
-#define PICM_COMMAND 0x20
-#define PICM_DATA    0x21
-#define PICS_COMMAND 0xA0
-#define PICS_DATA    0xA1
-
 .section .text
 .globl _entry
 
@@ -32,6 +27,11 @@ hang:
     cli
     hlt
     jmp hang
+
+#define PICM_COMMAND 0x20
+#define PICM_DATA    0x21
+#define PICS_COMMAND 0xA0
+#define PICS_DATA    0xA1
 
 // We will need to reprogram the pic so that it does not conflict with
 // cpu's intel exceptions
@@ -68,6 +68,38 @@ ignore_int:
 	movb $4,0xb8001
     iret
 
+
+
+// TODO: move this to proper file
+// void switch_to(struct task_struct *curr, struct task_struct *next);
+.globl switch_to
+switch_to:
+    /* 1. Save callee-saved registers on Task A's stack */
+    pushl %ebp
+    pushl %ebx
+    pushl %esi
+    pushl %edi
+
+    movl 20(%esp), %eax      /* eax = curr (pointer to task_struct) */
+    movl 24(%esp), %edx      /* edx = next (pointer to task_struct) */
+
+    movl %esp, (%eax)        /* curr->esp = esp (freeze Task A) */
+    movl (%edx), %esp        /* esp = next->esp (switch to Task B) */
+
+    popl %edi
+    popl %esi
+    popl %ebx
+    popl %ebp
+
+    ret
+
+
+
+
+
+
+
+
 .section .rodata
 // IDT descriptor
 .globl idt_desc
@@ -85,6 +117,8 @@ idt_table:
 .section .bss.kernel_stack, "aw", @nobits
 /* Kernel Stack, 4KiB */
 .balign 0x1000
+.globl kstack_bottom
 kstack_bottom:
 .skip 0x1000
 kstack_top:
+

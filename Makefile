@@ -6,11 +6,11 @@ CC = gcc
 # CC = clang -target i686-unknown-none-elf
 LD = ld
 
-CFLAGS  := -Wall -Wextra -ffreestanding -nostdlib -fno-pie -mno-red-zone -fno-stack-protector -Wframe-larger-than=512
+CFLAGS    := -Wall -Wextra -ffreestanding -nostdlib -Werror -fno-pie -mno-red-zone -fno-stack-protector -Wframe-larger-than=512
 ASFLAGS   := $(CFLAGS)
 LDFLAGS   := -nostdlib -static --emit-relocs
 
-CFLAGS += -std=c23
+CFLAGS += -std=c23 -g
 CFLAGS += -Iarch/$(ARCH)/include -Iinclude
 
 # -------- Architecture-specific flags -------
@@ -26,8 +26,8 @@ ASM_SRCS :=
 
 # ------------ Sources -----------
 include arch/$(ARCH)/Makefile # architecture specific sources
-include lib/Makefile
 include kernel/Makefile
+include lib/Makefile
 
 C_OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(C_SRCS))
 ASM_OBJS := $(patsubst %.S, $(BUILD_DIR)/%.o, $(ASM_SRCS))
