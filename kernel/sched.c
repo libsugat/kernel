@@ -11,7 +11,7 @@ uint32_t task_len = 0;
 void create_new_task(void (*entry)(void), uint8_t *stack)
 {
     if (task_len >= N_TASKS) return;
-    tasks[task_len++] = _create_new_task(entry, stack);
+    _create_new_task(&tasks[task_len++], entry, stack);
 }
 
 int current_task = -1;

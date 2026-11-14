@@ -7,6 +7,10 @@
 #include <kernel/types.h>
 #include <arch/mm.h>
 
+// The page size should be a valid power of 2 
+STATIC_ASSERT((PAGE_SIZE > 0) && ((PAGE_SIZE & (PAGE_SIZE - 1)) == 0),
+               "PAGE_SIZE must be a positive power of two");
+
 struct boot_info_struct;
 
 enum page_status {
@@ -38,7 +42,7 @@ struct mem_map {
     struct page_meta *freelist[MAX_ORDER_ALLOC];
 };
 
-STATIC_ASSERT(sizeof(struct page_meta) <= 64, "struct page_meta >= 64; struct size limit crossed");
+STATIC_ASSERT(sizeof(struct page_meta) <= 64, "struct page_meta >= 64; struct size limit crossed...");
 
 void init_mm(struct boot_info_struct *);
 struct page_meta* alloc_page_frame(uint8_t order);

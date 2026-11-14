@@ -16,22 +16,22 @@ struct vga_entry {
     u8 setting;
 } PACKED;
 
-#define DEBUG
-
 static size_t tty_row;
 static size_t tty_col;
 static u8     tty_color;
 static struct vga_entry volatile * const tty_buff = (struct vga_entry volatile *) VGA_BUFFER_ADDRESS;
 
+#define DEBUG
+
 #if defined(DEBUG)
 #define COM1 0x3F8
 static inline void outb(uint16_t port, uint8_t val) {
-    __asm__ volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
+    __asm__ __volatile__ ("outb %0, %1" : : "a"(val), "Nd"(port));
 }
 
 static inline uint8_t inb(uint16_t port) {
     uint8_t ret;
-    __asm__ volatile ("inb %1, %0" : "=a"(ret) : "Nd"(port));
+    __asm__ __volatile__ ("inb %1, %0" : "=a"(ret) : "Nd"(port));
     return ret;
 }
 

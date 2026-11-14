@@ -1,12 +1,12 @@
 # Terminal options
-ARCH ?= ia32
+ARCH ?= x86_64
 
 # Toolchain Configuration
 CC = gcc
 # CC = clang -target i686-unknown-none-elf
 LD = ld
 
-CFLAGS    := -Wall -Wextra -ffreestanding -nostdlib -Werror -fno-pie -mno-red-zone -fno-stack-protector -Wframe-larger-than=512
+CFLAGS := -Wall -Wextra -Werror -ffreestanding -nostdlib -fno-pic -fno-pie -fno-stack-protector -Wframe-larger-than=512
 ASFLAGS   := $(CFLAGS)
 LDFLAGS   := -nostdlib -static --emit-relocs
 

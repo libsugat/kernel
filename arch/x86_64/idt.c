@@ -20,7 +20,13 @@ extern struct local_irqc_ops lapic_ops; // apic.c
 extern void (*isr_stub_list[256])(void); // Do not touch
 
 void initialize_interrupts(void) {
-    for (int i = 0; i < 256; i++) {
+    int i = 0;
+    for (; i < 32; i++) {
+        set_trap_gate(&idt_table, i, isr_stub_list[i]);
+    }
+    set_int_gate(&idt_table, 2, isr_stub_list[2]); // NMI external interrupt
+    set_int_gate(&idt_table, 8, isr_stub_list[8]); // Double fault : Later solve it with TSS
+    for (; i < 256; i++) {
         set_int_gate(&idt_table, i, isr_stub_list[i]);
     }
 
@@ -93,6 +99,17 @@ void master_fault_handler(struct interrupt_frame * intr_frame) {
            );
 
     switch (intr_frame->vector_no) {
+        case 0x0E:
+            kputs("==========================\n");
+            kputs(" Page fault\n");
+            kputs("==========================\n");
+            uintptr_t addr;
+            __asm__ __volatile__("movq %%cr2, %0"
+                    :"=r"(addr)
+                    :: "memory");
+            kprintf("Address : %x\n", addr);
+            arch_wait_for_interrupt();
+            break;
         case 0x0D:
             kputs("==========================\n");
             kputs(" General Protection Fault\n");

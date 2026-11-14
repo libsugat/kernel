@@ -3,6 +3,25 @@
 #include <kernel/types.h>
 #include <karg.h>
 
+void kputc(const char c) {
+    tty_putchar(c);
+}
+
+void kputs(const char *s) {
+    if (!s) {
+        s = "(null)";
+    }
+    tty_write_str(s);
+}
+
+void kputsn(const char *s, size_t len) {
+    if (!s) {
+        s = "(null)";
+        len = 6;
+    }
+    tty_write(s, len);
+}
+
 static void kprint_uint(uint32_t n) {
     char buffer[10]; 
     size_t i = 0;
@@ -22,23 +41,10 @@ static void kprint_uint(uint32_t n) {
 static void kprint_int(int32_t n) {
     if (n < 0) {
         kputc('-');
-        uint32_t u = -(uint32_t)n;
-        kprint_uint(u);
+        kprint_uint(-(uint32_t)n);
     } else {
         kprint_uint((uintmax_t)n);
     }
-}
-
-void kputc(const char c) {
-    tty_putchar(c);
-}
-
-void kputs(const char *s) {
-    tty_write_str(s);
-}
-
-void kputsn(const char *s, size_t len) {
-    tty_write(s, len);
 }
 
 void kprintf(const char *format, ...)
@@ -51,47 +57,35 @@ void kprintf(const char *format, ...)
             kputc(*p);
             continue;
         }
-
-        union {
-            char c, *s;
-            reg_t x;
-            uint32_t num;
-            int32_t unum;
-        } data;
         
         switch (*(++p)) {
             // Printing character
             case 'c':
-                data.c = (int)k_va_arg(args, int);
-                kputc(data.c);
+                kputc(k_va_arg(args, int));
                 break;
 
             // Printing String
             case 's':
-                data.s = k_va_arg(args, char*);
-                kputs(data.s);
+                kputs(k_va_arg(args, char*));
                 break;
 
             // Printing hex data, with the width of cpu register
             case 'x':
-                data.x = k_va_arg(args, reg_t);
-                kprint_hex(data.x);
+                kprint_hex(k_va_arg(args, reg_t));
                 break;
 
             case 'd':
-                data.x = k_va_arg(args, int32_t);
-                kprint_int(data.num);
+                kprint_int(k_va_arg(args, int32_t));
                 break;
 
             case 'u':
-                data.x = k_va_arg(args, uint32_t);
-                kprint_uint(data.unum);
+                kprint_uint(k_va_arg(args, uint32_t));
                 break;
 
             // in case of string ending with %
             case '\0':
                 kputc('%');
-                return;
+                goto printing_done;
 
             // If it was not a format specifier
             default:
@@ -99,6 +93,7 @@ void kprintf(const char *format, ...)
                 kputc(*p);
         };
     }
+printing_done:
     k_va_end(args);
 }
 // void ksnprintf(char *buf, size_t size, const char *format, ...);
@@ -109,7 +104,7 @@ void kprint_hex##suffix(const type val) {                       \
     const int START_SHIFT = (sizeof(type) * 2 - 1) * 4;         \
     for (int i = START_SHIFT; i >= 0; i -= 4) {                 \
         uint8_t num = (val >> i) & 0xF;                         \
-        tty_putchar(num < 10 ? ('0' + num): (num + ('A' - 10)));\
+        tty_putchar('0' + num + ((9 - num) >> 8 & 7));          \
     }                                                           \
 }
 
@@ -130,6 +125,7 @@ void kmemdump_n(const void *addr, size_t size, const uint8_t access_width) {
         size_t rem = size - i;
         size_t row_bytes = (rem < 16) ? rem : 16;
         for (size_t j = 0; j < row_bytes; j += access_width) {
+
             uintptr_t current_addr = addr_val + i + j;
             switch (access_width) {
                 case 1: kprint_hex8(*(volatile uint8_t *)current_addr); break;

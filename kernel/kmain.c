@@ -11,6 +11,7 @@
 void task_A(void);
 void task_B(void);
 extern void *page_meta_to_start_addr(struct page_meta *);
+void initialize_interrupts() {}
 
 __attribute__((__noreturn__)) 
 void kernel_start(
@@ -30,7 +31,6 @@ void kernel_start(
     init_sched();
     kputs("OS Initialization Successful...\n\n");
 
-
     // remove this asap
     struct page_meta * task_a_stack = alloc_page_frame(0);
     struct page_meta * task_b_stack = alloc_page_frame(0);
@@ -47,14 +47,12 @@ void kernel_start(
 
 void task_A(void) {
     for (;;) {
-        kprintf("SUGAT \n");
-        arch_wait_for_interrupt();
+        kprintf("SUGAT\n");
     }
 }
 
 void task_B(void) {
     for (;;) {
-        kprintf("BAGDE \n");
-        arch_wait_for_interrupt();
+        kprintf("BAGDE\n");
     }
 }

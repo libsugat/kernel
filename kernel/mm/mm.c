@@ -23,7 +23,6 @@ static UNUSED void dump_alloc_map() {
 void init_mm(struct boot_info_struct * boot_info) {
     arch_preprocess_memory_map(boot_info);
     arch_init_mem_map(boot_info, &mmap);
-    // dump_alloc_map();
 }
 
 void* page_meta_to_start_addr(const struct page_meta * page) {
@@ -78,16 +77,15 @@ struct page_meta* alloc_page_frame(uint8_t order) {
     for (;free_order <= MAX_ORDER; free_order++) {
         freepage = mmap.freelist[free_order];
         if (freepage) {
-            freelist_unlink(freepage, free_order);
-            break;
+            goto found_page_frame;
         }
     }
 
-    if (!freepage)
-    {
-        kprintf("[alloc_page_frame] free_order >= MAX_ORDER, or no page of order %d available\n", order);
-        return NULL; // Out of memory
-    }
+    kprintf("[alloc_page_frame] free_order >= MAX_ORDER, or no page of order %d available\n", order);
+    return NULL; // Out of memory
+
+found_page_frame:
+    freelist_unlink(freepage, free_order);
 
     size_t pfn = freepage - mmap.page_meta_arr;
 
@@ -96,7 +94,7 @@ struct page_meta* alloc_page_frame(uint8_t order) {
         free_order--;
         size_t buddy_pfn = BUDDY_PFN(pfn, free_order);
         
-        if (buddy_pfn >= mmap.n_pages) break;
+        if (buddy_pfn >= mmap.n_pages) break; // The buddy might be outside of the total available memory
         
         mmap.page_meta_arr[buddy_pfn].order = free_order;
         put_to_freelist(&mmap.page_meta_arr[buddy_pfn], free_order);

@@ -13,6 +13,7 @@
 #define IDT_ATTR_INT_GATE_32  0x0E // 0000 1110
 #define IDT_ATTR_TRAP_GATE_32 0x0F // 0000 1111
 
+// TODO: UPDATE to x86_64
 struct idt_entry {
     uint16_t offset_low;
     uint16_t segment_selector;
@@ -34,6 +35,10 @@ struct idtr {
     uint16_t size;
     uintptr_t offset;
 } PACKED;
+
+STATIC_ASSERT(sizeof(struct idt_entry) == 8, "idt_entry struct has incorrect size (must be 8 bytes)!");
+STATIC_ASSERT(sizeof(struct idtr) == 10, "idtr struct has incorrect size (must be 6 bytes)!");
+STATIC_ASSERT(sizeof(idt_t) == sizeof(struct idt_entry) * 256, "idt_tr should have 256 entries!");
 
 static ALWAYS_INLINE void set_gate(
     idt_t * idt, 

@@ -20,9 +20,8 @@ void task_trampoline(void (*entry)(void)) {
     }
 }
 
-struct task_struct _create_new_task(void (*entry)(void), uint8_t *stack) {
-    struct task_struct new_task;
-    new_task.kstack = stack;
+void _create_new_task(struct task_struct * new_task, void (*entry)(void), uint8_t *stack) {
+    new_task->kstack = stack;
     uint32_t * sp = (uint32_t *)((uintptr_t)stack + PAGE_SIZE);
     *(--sp) = (uintptr_t)entry;
     *(--sp) = 0;
@@ -32,7 +31,5 @@ struct task_struct _create_new_task(void (*entry)(void), uint8_t *stack) {
     *(--sp) = 0;
     *(--sp) = 0;
     *(--sp) = 0;
-    new_task.esp = (reg_t)sp;
-
-    return new_task;
+    new_task->esp = (reg_t)sp;
 }

@@ -11,7 +11,7 @@ struct task_struct {
     uint8_t * kstack;
 };
 
-struct task_struct _create_new_task(void (*entry)(void), uint8_t * stack);
+void _create_new_task(struct task_struct * new_task, void (*entry)(void), uint8_t * stack);
 
 // From entry.S
 extern void switch_to(struct task_struct* curr, struct task_struct *next);

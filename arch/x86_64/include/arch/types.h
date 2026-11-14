@@ -14,9 +14,9 @@ typedef __INT32_TYPE__   s32;
 typedef __INT64_TYPE__   s64;
 
 
-typedef u32 reg_t;
+typedef u64 reg_t;
 
-typedef u32 uintptr_t;
-typedef s32 ptrdiff_t;
+typedef u64 uintptr_t;
+typedef u64 ptrdiff_t;
 
 #endif // ARCH_IA32_TYPES_H
